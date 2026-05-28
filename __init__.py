@@ -9,7 +9,7 @@ import json
 
 FORMATTED = ['boxscore', 'game_highlights', 'game_pace', 'game_scoring_plays', 'last_game', 'league_leaders',
              'linescore', 'next_game', 'player_stats', 'roster', 'standings', 'team_leaders']
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static_1')
 bootstrap = Bootstrap5(app)
 all_cafes = {}
 app.secret_key = "38dkkd8lk3009328dld88ldk3294874l"
@@ -72,13 +72,19 @@ def home():
 def meta_queries():
     textform = 'y'  # list of dictionaries
     form = request.form.to_dict(flat=False)
+    print("form['meta_type'][0] is " + form['meta_type'][0])
     results = statsapi.meta(form['meta_type'][0])
     data = json.dumps(results, indent=2)
-    # print(f"param_name is {param_name}")
-    # result = eval('statsapi.meta("' + param_name + '")')
 
-    return render_template('index.html', istext=textform, data=data)
+    # create an html table from the results
+    table = "<table border=1 cellpading=2 cellspacing=2 valign=middle align=center>"
+    table += "<tr><td valign=middle align=center><b><u>Code</u></b></td><td valign=middle align=center><b><u>Value</u></b></td></tr>\n"
 
+    for record in results:
+        table +=  "<tr><td valign=middle align=center>" + str(list(record.values())[0]) + "</td><td valign=middle align=center>" + str(list(record.values())[1]) + "</td></tr>\n"
+
+    table += "</table>"
+    return render_template('index.html', istext=textform, data=table)
 
 @app.route('/notes', methods=['POST'])
 def query_notes():
@@ -104,4 +110,6 @@ def raw_queries():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+#    app.run(debug=True)
+	app.run(host='0-.0.0.0', port=5000)
+
